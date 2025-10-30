@@ -1,12 +1,12 @@
 import React from "react"
-import { fetcher } from "../helpers/api"
+import { api, fetcher } from "../helpers/api"
 import type { User } from "../models/user"
 
 export default function useUser() {
     const [user, setUser] = React.useState<User | null>(null)
     const [userRequestStatus, setUserRequestStatus] = React.useState<'idle' | 'loading' | 'saving'>('idle')
 
-    const getUser = React.useCallback(async (id: number) => {
+    const getUser = React.useCallback(async (id: string) => {
         try {
             setUserRequestStatus('loading')
 
@@ -20,10 +20,25 @@ export default function useUser() {
         }
     }, [])
 
+    async function createuser(payload: User) {
+        try {
+            setUserRequestStatus('saving')
+
+            await api('/users', {method: 'POST', body: JSON.stringify(payload)})
+
+            alert('Usuário criado com sucesso!')
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setUserRequestStatus('idle')
+        }
+    }
+
 
     return {
         user,
         userRequestStatus,
-        getUser
+        getUser,
+        createuser
     }
 }
